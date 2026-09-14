@@ -1,34 +1,46 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { Logo } from '@/components/Logo';
 import { useReliableStore } from '@/lib/store';
 import { Role } from '@/lib/types';
 import { DEMO_USERS } from '@/lib/mock-data';
 import { 
   Shield, Lock, Mail, ArrowRight, CheckCircle2, 
-  Building2, KeyRound, Sparkles, Copy, Check 
+  Building2, KeyRound, Sparkles, Copy, Check, AlertCircle 
 } from 'lucide-react';
 import Link from 'next/link';
 
 export default function AdminLoginPage() {
-  const router = useRouter();
-  const { setRole } = useReliableStore();
+  const { login, setRole } = useReliableStore();
 
   const [email, setEmail] = useState('admin@reliableprocure.com');
   const [password, setPassword] = useState('Admin@123');
   const [selectedRole, setSelectedRole] = useState<Role>('SUPER_ADMIN');
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [copiedRole, setCopiedRole] = useState<string | null>(null);
 
   const handleRoleSelect = (role: Role) => {
     setSelectedRole(role);
+    setErrorMsg(null);
     const user = DEMO_USERS[role];
     if (user) {
       setEmail(user.email);
       setPassword(user.password || 'Reliable@123');
     }
+  };
+
+  const handleInstantLogin = (role: Role) => {
+    setErrorMsg(null);
+    setIsLoading(true);
+    const user = DEMO_USERS[role];
+    setRole(role);
+    setSuccessMsg(`Signing in as ${user.name} (${role.replace('_', ' ')})...`);
+    setTimeout(() => {
+      window.location.href = '/dashboard';
+    }, 300);
   };
 
   const copyCreds = (e: React.MouseEvent, roleKey: string, roleEmail: string, rolePass: string) => {
@@ -40,13 +52,19 @@ export default function AdminLoginPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMsg(null);
     setIsLoading(true);
 
-    setTimeout(() => {
-      setRole(selectedRole);
+    const res = login(email, password);
+    if (!res.success) {
       setIsLoading(false);
-      router.push('/dashboard');
-    }, 400);
+      setErrorMsg(res.message || 'Invalid credentials. Please verify your email and password.');
+    } else {
+      setSuccessMsg('Authentication successful! Opening dashboard...');
+      setTimeout(() => {
+        window.location.href = '/dashboard';
+      }, 300);
+    }
   };
 
   return (
@@ -76,10 +94,10 @@ export default function AdminLoginPage() {
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
               <KeyRound className="w-3.5 h-3.5 text-blue-600" />
-              Demo Roles & User Credentials (Click to Auto-fill)
+              Demo Roles & User Credentials (Click Card to Login)
             </span>
             <span className="text-[10px] text-blue-600 font-semibold bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200">
-              1-Click Login
+              1-Click Direct Access
             </span>
           </div>
 
@@ -89,25 +107,34 @@ export default function AdminLoginPage() {
               onClick={() => handleRoleSelect('SUPER_ADMIN')}
               className={`p-3 rounded-xl border text-left cursor-pointer transition ${
                 selectedRole === 'SUPER_ADMIN'
-                  ? 'bg-purple-50/80 border-purple-400 ring-2 ring-purple-400/30'
+                  ? 'bg-purple-50/90 border-purple-500 ring-2 ring-purple-400/30'
                   : 'bg-slate-50 border-slate-200 hover:bg-slate-100'
               }`}
             >
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-purple-900 flex items-center gap-1">
-                  <Shield className="w-3 h-3 text-purple-600" /> Super Admin
+                  <Shield className="w-3.5 h-3.5 text-purple-600" /> Super Admin
                 </span>
-                <button
-                  type="button"
-                  onClick={(e) => copyCreds(e, 'SUPER_ADMIN', DEMO_USERS.SUPER_ADMIN.email, DEMO_USERS.SUPER_ADMIN.password!)}
-                  className="text-slate-400 hover:text-slate-700"
-                  title="Copy credentials"
-                >
-                  {copiedRole === 'SUPER_ADMIN' ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
-                </button>
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={(e) => copyCreds(e, 'SUPER_ADMIN', DEMO_USERS.SUPER_ADMIN.email, DEMO_USERS.SUPER_ADMIN.password!)}
+                    className="text-slate-400 hover:text-slate-700 p-0.5"
+                    title="Copy credentials"
+                  >
+                    {copiedRole === 'SUPER_ADMIN' ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); handleInstantLogin('SUPER_ADMIN'); }}
+                    className="text-[10px] bg-purple-600 hover:bg-purple-700 text-white font-bold px-2 py-0.5 rounded shadow-xs"
+                  >
+                    Enter ➜
+                  </button>
+                </div>
               </div>
-              <div className="text-[11px] font-mono text-slate-700 mt-1">{DEMO_USERS.SUPER_ADMIN.email}</div>
-              <div className="text-[10px] text-slate-500 font-mono">Pass: <strong>{DEMO_USERS.SUPER_ADMIN.password}</strong></div>
+              <div className="text-[11px] font-mono text-slate-800 font-semibold mt-1">{DEMO_USERS.SUPER_ADMIN.email}</div>
+              <div className="text-[10px] text-slate-500 font-mono">Password: <strong className="text-slate-700">{DEMO_USERS.SUPER_ADMIN.password}</strong></div>
             </div>
 
             {/* Corporate Buyer */}
@@ -115,25 +142,34 @@ export default function AdminLoginPage() {
               onClick={() => handleRoleSelect('BUYER')}
               className={`p-3 rounded-xl border text-left cursor-pointer transition ${
                 selectedRole === 'BUYER'
-                  ? 'bg-blue-50/80 border-blue-400 ring-2 ring-blue-400/30'
+                  ? 'bg-blue-50/90 border-blue-500 ring-2 ring-blue-400/30'
                   : 'bg-slate-50 border-slate-200 hover:bg-slate-100'
               }`}
             >
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-blue-900 flex items-center gap-1">
-                  <Building2 className="w-3 h-3 text-blue-600" /> Corporate Buyer
+                  <Building2 className="w-3.5 h-3.5 text-blue-600" /> Corporate Buyer
                 </span>
-                <button
-                  type="button"
-                  onClick={(e) => copyCreds(e, 'BUYER', DEMO_USERS.BUYER.email, DEMO_USERS.BUYER.password!)}
-                  className="text-slate-400 hover:text-slate-700"
-                  title="Copy credentials"
-                >
-                  {copiedRole === 'BUYER' ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
-                </button>
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={(e) => copyCreds(e, 'BUYER', DEMO_USERS.BUYER.email, DEMO_USERS.BUYER.password!)}
+                    className="text-slate-400 hover:text-slate-700 p-0.5"
+                    title="Copy credentials"
+                  >
+                    {copiedRole === 'BUYER' ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); handleInstantLogin('BUYER'); }}
+                    className="text-[10px] bg-blue-600 hover:bg-blue-700 text-white font-bold px-2 py-0.5 rounded shadow-xs"
+                  >
+                    Enter ➜
+                  </button>
+                </div>
               </div>
-              <div className="text-[11px] font-mono text-slate-700 mt-1">{DEMO_USERS.BUYER.email}</div>
-              <div className="text-[10px] text-slate-500 font-mono">Pass: <strong>{DEMO_USERS.BUYER.password}</strong></div>
+              <div className="text-[11px] font-mono text-slate-800 font-semibold mt-1">{DEMO_USERS.BUYER.email}</div>
+              <div className="text-[10px] text-slate-500 font-mono">Password: <strong className="text-slate-700">{DEMO_USERS.BUYER.password}</strong></div>
             </div>
 
             {/* Finance Approver */}
@@ -141,25 +177,34 @@ export default function AdminLoginPage() {
               onClick={() => handleRoleSelect('APPROVER')}
               className={`p-3 rounded-xl border text-left cursor-pointer transition ${
                 selectedRole === 'APPROVER'
-                  ? 'bg-emerald-50/80 border-emerald-400 ring-2 ring-emerald-400/30'
+                  ? 'bg-emerald-50/90 border-emerald-500 ring-2 ring-emerald-400/30'
                   : 'bg-slate-50 border-slate-200 hover:bg-slate-100'
               }`}
             >
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-emerald-900 flex items-center gap-1">
-                  <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Finance Approver
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> Finance Approver
                 </span>
-                <button
-                  type="button"
-                  onClick={(e) => copyCreds(e, 'APPROVER', DEMO_USERS.APPROVER.email, DEMO_USERS.APPROVER.password!)}
-                  className="text-slate-400 hover:text-slate-700"
-                  title="Copy credentials"
-                >
-                  {copiedRole === 'APPROVER' ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
-                </button>
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={(e) => copyCreds(e, 'APPROVER', DEMO_USERS.APPROVER.email, DEMO_USERS.APPROVER.password!)}
+                    className="text-slate-400 hover:text-slate-700 p-0.5"
+                    title="Copy credentials"
+                  >
+                    {copiedRole === 'APPROVER' ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); handleInstantLogin('APPROVER'); }}
+                    className="text-[10px] bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-2 py-0.5 rounded shadow-xs"
+                  >
+                    Enter ➜
+                  </button>
+                </div>
               </div>
-              <div className="text-[11px] font-mono text-slate-700 mt-1">{DEMO_USERS.APPROVER.email}</div>
-              <div className="text-[10px] text-slate-500 font-mono">Pass: <strong>{DEMO_USERS.APPROVER.password}</strong></div>
+              <div className="text-[11px] font-mono text-slate-800 font-semibold mt-1">{DEMO_USERS.APPROVER.email}</div>
+              <div className="text-[10px] text-slate-500 font-mono">Password: <strong className="text-slate-700">{DEMO_USERS.APPROVER.password}</strong></div>
             </div>
 
             {/* Supplier / Vendor */}
@@ -167,31 +212,55 @@ export default function AdminLoginPage() {
               onClick={() => handleRoleSelect('VENDOR')}
               className={`p-3 rounded-xl border text-left cursor-pointer transition ${
                 selectedRole === 'VENDOR'
-                  ? 'bg-amber-50/80 border-amber-400 ring-2 ring-amber-400/30'
+                  ? 'bg-amber-50/90 border-amber-500 ring-2 ring-amber-400/30'
                   : 'bg-slate-50 border-slate-200 hover:bg-slate-100'
               }`}
             >
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-amber-950 flex items-center gap-1">
-                  <KeyRound className="w-3 h-3 text-amber-600" /> Supplier / Vendor
+                  <KeyRound className="w-3.5 h-3.5 text-amber-600" /> Supplier / Vendor
                 </span>
-                <button
-                  type="button"
-                  onClick={(e) => copyCreds(e, 'VENDOR', DEMO_USERS.VENDOR.email, DEMO_USERS.VENDOR.password!)}
-                  className="text-slate-400 hover:text-slate-700"
-                  title="Copy credentials"
-                >
-                  {copiedRole === 'VENDOR' ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
-                </button>
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={(e) => copyCreds(e, 'VENDOR', DEMO_USERS.VENDOR.email, DEMO_USERS.VENDOR.password!)}
+                    className="text-slate-400 hover:text-slate-700 p-0.5"
+                    title="Copy credentials"
+                  >
+                    {copiedRole === 'VENDOR' ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); handleInstantLogin('VENDOR'); }}
+                    className="text-[10px] bg-amber-600 hover:bg-amber-700 text-white font-bold px-2 py-0.5 rounded shadow-xs"
+                  >
+                    Enter ➜
+                  </button>
+                </div>
               </div>
-              <div className="text-[11px] font-mono text-slate-700 mt-1">{DEMO_USERS.VENDOR.email}</div>
-              <div className="text-[10px] text-slate-500 font-mono">Pass: <strong>{DEMO_USERS.VENDOR.password}</strong></div>
+              <div className="text-[11px] font-mono text-slate-800 font-semibold mt-1">{DEMO_USERS.VENDOR.email}</div>
+              <div className="text-[10px] text-slate-500 font-mono">Password: <strong className="text-slate-700">{DEMO_USERS.VENDOR.password}</strong></div>
             </div>
           </div>
         </div>
 
         {/* Login Card Form */}
         <div className="bg-white py-7 px-6 sm:px-8 shadow-md rounded-2xl border border-slate-200 space-y-5">
+          
+          {errorMsg && (
+            <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-800 flex items-start gap-2 animate-in fade-in">
+              <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+              <div>{errorMsg}</div>
+            </div>
+          )}
+
+          {successMsg && (
+            <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-800 flex items-start gap-2 animate-in fade-in">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+              <div>{successMsg}</div>
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">
@@ -203,7 +272,7 @@ export default function AdminLoginPage() {
                   type="email"
                   required
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => { setEmail(e.target.value); setErrorMsg(null); }}
                   className="w-full bg-white border border-slate-300 rounded-xl pl-9 pr-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                   placeholder="name@company.com"
                 />
@@ -225,7 +294,7 @@ export default function AdminLoginPage() {
                   type="text"
                   required
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => { setPassword(e.target.value); setErrorMsg(null); }}
                   className="w-full bg-white border border-slate-300 rounded-xl pl-9 pr-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 font-mono"
                 />
               </div>

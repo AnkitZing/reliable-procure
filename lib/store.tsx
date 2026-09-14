@@ -66,6 +66,9 @@ interface ReliableStoreContextType {
   companies: Company[];
   toggleCompanyStatus: (companyId: string) => void;
   resetDemoData: () => void;
+  isAuthenticated: boolean;
+  login: (email: string, password?: string) => { success: boolean; message?: string };
+  logout: () => void;
 }
 
 const ReliableContext = createContext<ReliableStoreContextType | null>(null);
@@ -79,6 +82,7 @@ export function ReliableProvider({ children }: { children: React.ReactNode }) {
   const [rfqs, setRfqs] = useState<RFQ[]>(INITIAL_RFQS);
   const [matches, setMatches] = useState<ThreeWayMatch[]>(INITIAL_MATCHES);
   const [companies, setCompanies] = useState<Company[]>(INITIAL_COMPANIES);
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
   const [isLoaded, setIsLoaded] = useState(false);
 
   // Initialize once on mount
@@ -91,6 +95,7 @@ export function ReliableProvider({ children }: { children: React.ReactNode }) {
     const storedRfqs = getStored<RFQ[]>(STORAGE_KEYS.RFQS, INITIAL_RFQS);
     const storedMatches = getStored<ThreeWayMatch[]>(STORAGE_KEYS.MATCHES, INITIAL_MATCHES);
     const storedCompanies = getStored<Company[]>(STORAGE_KEYS.COMPANIES, INITIAL_COMPANIES);
+    const storedAuth = getStored<boolean>(`${STORAGE_PREFIX}auth`, true);
 
     setCurrentRoleState(storedRole);
     setCart(storedCart);
@@ -100,12 +105,34 @@ export function ReliableProvider({ children }: { children: React.ReactNode }) {
     setRfqs(storedRfqs);
     setMatches(storedMatches);
     setCompanies(storedCompanies);
+    setIsAuthenticated(storedAuth);
     setIsLoaded(true);
   }, []);
 
   const setRole = (role: Role) => {
     setCurrentRoleState(role);
     saveStored(STORAGE_KEYS.CURRENT_ROLE, role);
+  };
+
+  const login = (email: string, password?: string) => {
+    const cleanEmail = email.trim().toLowerCase();
+    const matchedUser = Object.values(DEMO_USERS).find(u => u.email.toLowerCase() === cleanEmail);
+    if (!matchedUser) {
+      return { success: false, message: 'Invalid enterprise email. Please select or enter one of the demo emails.' };
+    }
+    if (password && matchedUser.password && matchedUser.password !== password) {
+      return { success: false, message: `Incorrect password for ${matchedUser.name}. (Correct: ${matchedUser.password})` };
+    }
+    setCurrentRoleState(matchedUser.role);
+    saveStored(STORAGE_KEYS.CURRENT_ROLE, matchedUser.role);
+    setIsAuthenticated(true);
+    saveStored(`${STORAGE_PREFIX}auth`, true);
+    return { success: true };
+  };
+
+  const logout = () => {
+    setIsAuthenticated(false);
+    saveStored(`${STORAGE_PREFIX}auth`, false);
   };
 
   const currentUser: User = DEMO_USERS[currentRole] || DEMO_USERS.SUPER_ADMIN;
@@ -498,7 +525,10 @@ export function ReliableProvider({ children }: { children: React.ReactNode }) {
         matches,
         companies,
         toggleCompanyStatus,
-        resetDemoData
+        resetDemoData,
+        isAuthenticated,
+        login,
+        logout
       }}
     >
       {children}
