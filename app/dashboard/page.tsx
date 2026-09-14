@@ -1,8 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { Navbar } from '@/components/Navbar';
+import { EnterpriseSidebar } from '@/components/EnterpriseSidebar';
 import { useReliableStore } from '@/lib/store';
 import { Role } from '@/lib/types';
 import { 
@@ -13,12 +15,16 @@ import {
   Eye, Check, ExternalLink, RefreshCw
 } from 'lucide-react';
 
-export default function DashboardPage() {
+function DashboardContent() {
   const { 
     currentRole, currentUser, setRole, requisitions, 
     purchaseOrders, rfqs, approveRequisition, rejectRequisition,
     matches, updatePOStatus, companies, toggleCompanyStatus, resetDemoData 
   } = useReliableStore();
+
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const searchParams = useSearchParams();
+  const activeTab = searchParams.get('tab') || 'overview';
 
   const [rejectingPrId, setRejectingPrId] = useState<string | null>(null);
   const [rejectReason, setRejectReason] = useState('');
@@ -55,9 +61,12 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col">
-      <Navbar />
+      <Navbar onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      <div className="flex-1 flex max-w-7xl w-full mx-auto">
+        <EnterpriseSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 space-y-6">
         
         {/* Dynamic Role Status Bar with 1-Click Switcher */}
         <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-4">
@@ -225,6 +234,122 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
+
+        {/* SUBMENU TAB 1: LIVE SOURCING MONITOR */}
+        {activeTab === 'monitor' && (
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div>
+                <h2 className="text-base font-black text-slate-900">Live Procurement & Logistics Sourcing Monitor</h2>
+                <p className="text-xs text-slate-500">Real-time telemetry of PR creation, threshold authorizations, carrier dispatches, and 3-way GRN matches</p>
+              </div>
+              <span className="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                Live Feed Active
+              </span>
+            </div>
+
+            <div className="space-y-3">
+              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center font-bold">PO</div>
+                  <div>
+                    <div className="font-bold text-slate-900">PO-2026-0941 &bull; BlueDart AWB BLUEDART-8829104</div>
+                    <div className="text-[11px] text-slate-500">Karam Safety Solutions &rarr; Tata Advanced Systems (Plant Gate 2, Pune)</div>
+                  </div>
+                </div>
+                <span className="px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800 font-bold text-[10px]">
+                  IN TRANSIT
+                </span>
+              </div>
+
+              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center font-bold">PR</div>
+                  <div>
+                    <div className="font-bold text-slate-900">PR-2026-0189 &bull; Value ₹69,384 (Threshold Exceeded &ge; ₹15k)</div>
+                    <div className="text-[11px] text-slate-500">Requester: Ankit Jain &bull; Awaiting Sign-off: Vikramaditya Rao</div>
+                  </div>
+                </div>
+                <span className="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 font-bold text-[10px]">
+                  PENDING APPROVAL
+                </span>
+              </div>
+
+              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center font-bold">3W</div>
+                  <div>
+                    <div className="font-bold text-slate-900">PO-2026-0895 &bull; 3-Way Reconciliation Perfect Match</div>
+                    <div className="text-[11px] text-slate-500">PO ₹49,560 == Physical GRN (35 Pcs) == GST Invoice ₹49,560</div>
+                  </div>
+                </div>
+                <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[10px]">
+                  PAYMENT CLEARED
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* SUBMENU TAB 2: SYSTEM AUDIT TRAIL */}
+        {activeTab === 'audit' && (
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div>
+                <h2 className="text-base font-black text-slate-900">Enterprise P2P Compliance & Audit Trail</h2>
+                <p className="text-xs text-slate-500">Immutable ledger of procurement actions, threshold bypasses, and tax verifications</p>
+              </div>
+              <button 
+                onClick={() => alert('Audit logs downloaded in CSV format!')}
+                className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition cursor-pointer"
+              >
+                Export Audit Log
+              </button>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs text-left">
+                <thead className="bg-slate-100 text-slate-600 font-bold border-b border-slate-200">
+                  <tr>
+                    <th className="p-3">Timestamp</th>
+                    <th className="p-3">Event Type</th>
+                    <th className="p-3">Entity / Cost Center</th>
+                    <th className="p-3">Initiating User</th>
+                    <th className="p-3">Audit Details</th>
+                    <th className="p-3 text-center">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 font-mono text-slate-700">
+                  <tr className="hover:bg-slate-50">
+                    <td className="p-3 text-slate-500">2026-09-14 17:15:10</td>
+                    <td className="p-3 font-bold text-slate-900">PR_EVALUATE</td>
+                    <td className="p-3">Tata Advanced Systems</td>
+                    <td className="p-3">ankit.jain@tataadvanced.com</td>
+                    <td className="p-3">PR-2026-0189 routed to Finance Approver (&gt; ₹15,000 threshold)</td>
+                    <td className="p-3 text-center"><span className="px-2 py-0.5 rounded bg-amber-100 text-amber-800 text-[10px] font-bold">ROUTED</span></td>
+                  </tr>
+                  <tr className="hover:bg-slate-50">
+                    <td className="p-3 text-slate-500">2026-09-10 14:20:00</td>
+                    <td className="p-3 font-bold text-slate-900">PO_AUTO_GEN</td>
+                    <td className="p-3">Tata Advanced Systems</td>
+                    <td className="p-3">P2P Autonomous Engine</td>
+                    <td className="p-3">PO-2026-0941 generated via &lt; ₹15k threshold fast-track rule</td>
+                    <td className="p-3 text-center"><span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[10px] font-bold">AUTHORIZED</span></td>
+                  </tr>
+                  <tr className="hover:bg-slate-50">
+                    <td className="p-3 text-slate-500">2026-09-10 14:15:00</td>
+                    <td className="p-3 font-bold text-slate-900">AWB_DISPATCH</td>
+                    <td className="p-3">Industrial Supply Hub</td>
+                    <td className="p-3">sales@industrialsupplyhub.in</td>
+                    <td className="p-3">Assigned carrier BlueDart Express (BLUEDART-8829104)</td>
+                    <td className="p-3 text-center"><span className="px-2 py-0.5 rounded bg-blue-100 text-blue-800 text-[10px] font-bold">DISPATCHED</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
 
         {/* ========================================================================= */}
         {/* MODULE 1: SUPER ADMIN OPERATIONS DESK */}
@@ -667,6 +792,7 @@ export default function DashboardPage() {
         </div>
 
       </main>
+      </div>
 
       {/* Reject Modal */}
       {rejectingPrId && (
@@ -755,5 +881,13 @@ export default function DashboardPage() {
       )}
 
     </div>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-slate-50 p-8 text-xs text-slate-500">Loading Enterprise Operations Dashboard...</div>}>
+      <DashboardContent />
+    </Suspense>
   );
 }

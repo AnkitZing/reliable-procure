@@ -35,7 +35,7 @@ export interface Product {
   id: string;
   name: string;
   sku: string;
-  category: 'Safety & PPE' | 'Industrial Tools & MRO' | 'Electrical & Electronics' | 'Office & IT Supplies' | 'Facility & Cleaning';
+  category: string;
   description: string;
   brand: string;
   basePrice: number;

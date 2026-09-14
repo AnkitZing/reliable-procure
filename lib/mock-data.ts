@@ -373,8 +373,147 @@ export const INITIAL_PRODUCTS: Product[] = [
     ],
     vendorId: 'comp-ven-01',
     vendorName: 'Industrial Supply Hub LLP'
+  },
+  {
+    id: 'prod-013',
+    name: 'Havells 150W Die-Cast Aluminium LED High Bay Light Fixture',
+    sku: 'LGT-HBY-013',
+    category: 'Lighting',
+    description: 'IP66 waterproof rated 150W UFO industrial LED high bay light, 150 lm/Watt luminous efficacy, 6500K cool white for warehouse and factory shed lighting.',
+    brand: 'Havells',
+    basePrice: 4800,
+    contractPrice: 4150,
+    hsnCode: '940540',
+    gstRate: 18,
+    unit: 'Units',
+    moq: 4,
+    stock: 260,
+    image: 'https://images.unsplash.com/photo-1565814636199-ae8133055c1c?auto=format&fit=crop&w=600&q=80',
+    tiers: [
+      { minQty: 4, price: 4150 },
+      { minQty: 16, price: 3850 },
+      { minQty: 50, price: 3550 }
+    ],
+    vendorId: 'comp-ven-01',
+    vendorName: 'Industrial Supply Hub LLP'
+  },
+  {
+    id: 'prod-014',
+    name: 'Polycab 4-Core 25 sq.mm Aluminium Armoured LT Cable (100m Drum)',
+    sku: 'CBL-ARM-014',
+    category: 'Cable and Cable Accessories',
+    description: '1.1kV grade XLPE insulated galvanized steel flat strip armoured power cable suitable for underground laying and industrial plant machinery wiring.',
+    brand: 'Polycab',
+    basePrice: 28500,
+    contractPrice: 24900,
+    hsnCode: '854449',
+    gstRate: 18,
+    unit: 'Drums',
+    moq: 1,
+    stock: 35,
+    image: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=600&q=80',
+    tiers: [
+      { minQty: 1, price: 24900 },
+      { minQty: 3, price: 23600 },
+      { minQty: 10, price: 22400 }
+    ],
+    vendorId: 'comp-ven-01',
+    vendorName: 'Industrial Supply Hub LLP'
+  },
+  {
+    id: 'prod-015',
+    name: 'Berger Epilux 4 Industrial Epoxy High Gloss Floor Coating (20L Drum)',
+    sku: 'PNT-EPX-015',
+    category: 'Paint & Polish',
+    description: 'Two-pack polyamide cured epoxy coating for concrete industrial floors, chemical spill zones, and pharmaceutical warehouse walkways.',
+    brand: 'Berger Protective',
+    basePrice: 9400,
+    contractPrice: 8200,
+    hsnCode: '320890',
+    gstRate: 18,
+    unit: 'Drums',
+    moq: 2,
+    stock: 90,
+    image: 'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?auto=format&fit=crop&w=600&q=80',
+    tiers: [
+      { minQty: 2, price: 8200 },
+      { minQty: 6, price: 7650 },
+      { minQty: 20, price: 7100 }
+    ],
+    vendorId: 'comp-ven-01',
+    vendorName: 'Industrial Supply Hub LLP'
+  },
+  {
+    id: 'prod-016',
+    name: 'Unbrako Grade 10.9 High Tensile Hex Bolts & Nuts M16 x 75mm (Box of 50)',
+    sku: 'HDW-BLT-016',
+    category: 'Hardware',
+    description: 'Alloy steel quenched and tempered high tensile socket head and hex bolts for heavy machine foundation and structural steel clamping.',
+    brand: 'Unbrako',
+    basePrice: 3250,
+    contractPrice: 2800,
+    hsnCode: '731815',
+    gstRate: 18,
+    unit: 'Boxes',
+    moq: 3,
+    stock: 310,
+    image: 'https://images.unsplash.com/photo-1586864387967-d02ef85d93e8?auto=format&fit=crop&w=600&q=80',
+    tiers: [
+      { minQty: 3, price: 2800 },
+      { minQty: 10, price: 2550 },
+      { minQty: 30, price: 2350 }
+    ],
+    vendorId: 'comp-ven-01',
+    vendorName: 'Industrial Supply Hub LLP'
+  },
+  {
+    id: 'prod-017',
+    name: 'Loctite 243 Medium Strength Threadlocker & Sealant (50ml Bottle)',
+    sku: 'ADH-LOC-017',
+    category: 'Adhesive, Sealants, Tapes',
+    description: 'Prevents loosening on vibrating assemblies such as pumps, gearboxes, and presses. Effective on all metals including passive substrates.',
+    brand: 'Loctite Henkel',
+    basePrice: 980,
+    contractPrice: 820,
+    hsnCode: '350691',
+    gstRate: 18,
+    unit: 'Bottles',
+    moq: 5,
+    stock: 480,
+    image: 'https://images.unsplash.com/photo-1617791160536-598cf32026fb?auto=format&fit=crop&w=600&q=80',
+    tiers: [
+      { minQty: 5, price: 820 },
+      { minQty: 20, price: 740 },
+      { minQty: 50, price: 680 }
+    ],
+    vendorId: 'comp-ven-01',
+    vendorName: 'Industrial Supply Hub LLP'
+  },
+  {
+    id: 'prod-018',
+    name: 'Brady OSHA Danger 415V High Voltage Shock Danger Board (12x18 Inch)',
+    sku: 'SGN-VLT-018',
+    category: 'Signages & Labels',
+    description: 'UV-resistant rigid retro-reflective aluminium composite panel sign board with bilingual (English/Hindi) safety warning symbols.',
+    brand: 'Brady',
+    basePrice: 650,
+    contractPrice: 520,
+    hsnCode: '831000',
+    gstRate: 18,
+    unit: 'Pieces',
+    moq: 5,
+    stock: 350,
+    image: 'https://images.unsplash.com/photo-1590402494682-cd3fb53b1f70?auto=format&fit=crop&w=600&q=80',
+    tiers: [
+      { minQty: 5, price: 520 },
+      { minQty: 25, price: 460 },
+      { minQty: 100, price: 395 }
+    ],
+    vendorId: 'comp-ven-02',
+    vendorName: 'Karam Safety Solutions'
   }
 ];
+
 
 export const INITIAL_REQUISITIONS: Requisition[] = [
   {

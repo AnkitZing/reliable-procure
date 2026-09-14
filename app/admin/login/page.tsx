@@ -46,8 +46,9 @@ export default function AdminLoginPage() {
       }
     }
     setSuccessMsg(`Authenticating as ${user.name} (${role.replace('_', ' ')})...`);
+    const dest = role === 'SUPER_ADMIN' ? '/admin' : '/dashboard';
     setTimeout(() => {
-      window.location.href = '/dashboard';
+      window.location.href = dest;
     }, 250);
   };
 
@@ -88,8 +89,9 @@ export default function AdminLoginPage() {
     }
 
     setSuccessMsg('Authentication successful! Opening dashboard...');
+    const dest = targetRole === 'SUPER_ADMIN' ? '/admin' : '/dashboard';
     setTimeout(() => {
-      window.location.href = '/dashboard';
+      window.location.href = dest;
     }, 250);
   };
 
