@@ -46,9 +46,16 @@ export interface Product {
   moq: number; // Minimum order quantity
   stock: number;
   image: string;
+  gallery?: string[];
   tiers: ProductTier[];
   vendorId: string;
   vendorName: string;
+  specifications?: Record<string, string>;
+  standards?: string[];
+  features?: string[];
+  leadTimeDays?: number;
+  warranty?: string;
+  origin?: string;
 }
 
 export interface CartItem {

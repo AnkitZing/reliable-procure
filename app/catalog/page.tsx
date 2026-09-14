@@ -422,11 +422,13 @@ function CatalogContent() {
                     >
                       {/* Product Image */}
                       <div className="relative h-44 bg-slate-100 overflow-hidden">
-                        <img
-                          src={product.image}
-                          alt={product.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
-                        />
+                        <Link href={`/product/${product.id}`} className="w-full h-full block">
+                          <img
+                            src={product.image}
+                            alt={product.name}
+                            className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                          />
+                        </Link>
                         <div className="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-md bg-blue-600/90 backdrop-blur-md text-white font-bold text-[10px]">
                           {product.category}
                         </div>
@@ -442,9 +444,11 @@ function CatalogContent() {
                             <span>{product.brand}</span>
                             <span className="font-mono text-[10px]">{product.sku}</span>
                           </div>
-                          <h3 className="text-xs font-bold text-slate-900 line-clamp-2 leading-snug">
-                            {product.name}
-                          </h3>
+                          <Link href={`/product/${product.id}`}>
+                            <h3 className="text-xs font-bold text-slate-900 group-hover:text-blue-600 transition line-clamp-2 leading-snug">
+                              {product.name}
+                            </h3>
+                          </Link>
                           <p className="text-[11px] text-slate-500 line-clamp-2 mt-1">
                             {product.description}
                           </p>
@@ -519,6 +523,14 @@ function CatalogContent() {
                               </>
                             )}
                           </button>
+
+                          <Link
+                            href={`/product/${product.id}`}
+                            className="px-2.5 py-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 text-xs font-bold transition"
+                            title="View Specs & Volume Tiers"
+                          >
+                            View
+                          </Link>
                         </div>
 
                       </div>

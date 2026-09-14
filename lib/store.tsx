@@ -9,7 +9,7 @@ import {
   INITIAL_REQUISITIONS, INITIAL_PURCHASE_ORDERS, INITIAL_RFQS, INITIAL_MATCHES 
 } from './mock-data';
 
-const STORAGE_PREFIX = 'reliable_v2_';
+const STORAGE_PREFIX = 'reliable_v3_';
 
 const STORAGE_KEYS = {
   CURRENT_ROLE: `${STORAGE_PREFIX}role`,
@@ -90,21 +90,34 @@ export function ReliableProvider({ children }: { children: React.ReactNode }) {
     const storedRole = getStored<Role>(STORAGE_KEYS.CURRENT_ROLE, 'SUPER_ADMIN');
     const storedCart = getStored<CartItem[]>(STORAGE_KEYS.CART, []);
     const storedProducts = getStored<Product[]>(STORAGE_KEYS.PRODUCTS, INITIAL_PRODUCTS);
+    
+    // Merge initial products with stored products so any newly added catalog items are guaranteed present
+    const prodMap = new Map<string, Product>();
+    INITIAL_PRODUCTS.forEach(p => prodMap.set(p.id, p));
+    storedProducts.forEach(p => prodMap.set(p.id, p));
+    const mergedProducts = Array.from(prodMap.values());
+
     const storedRequisitions = getStored<Requisition[]>(STORAGE_KEYS.REQUISITIONS, INITIAL_REQUISITIONS);
     const storedPOs = getStored<PurchaseOrder[]>(STORAGE_KEYS.PURCHASE_ORDERS, INITIAL_PURCHASE_ORDERS);
     const storedRfqs = getStored<RFQ[]>(STORAGE_KEYS.RFQS, INITIAL_RFQS);
     const storedMatches = getStored<ThreeWayMatch[]>(STORAGE_KEYS.MATCHES, INITIAL_MATCHES);
+    
     const storedCompanies = getStored<Company[]>(STORAGE_KEYS.COMPANIES, INITIAL_COMPANIES);
+    const compMap = new Map<string, Company>();
+    INITIAL_COMPANIES.forEach(c => compMap.set(c.id, c));
+    storedCompanies.forEach(c => compMap.set(c.id, c));
+    const mergedCompanies = Array.from(compMap.values());
+
     const storedAuth = getStored<boolean>(`${STORAGE_PREFIX}auth`, true);
 
     setCurrentRoleState(storedRole);
     setCart(storedCart);
-    setProducts(storedProducts);
+    setProducts(mergedProducts);
     setRequisitions(storedRequisitions);
     setPurchaseOrders(storedPOs);
     setRfqs(storedRfqs);
     setMatches(storedMatches);
-    setCompanies(storedCompanies);
+    setCompanies(mergedCompanies);
     setIsAuthenticated(storedAuth);
     setIsLoaded(true);
   }, []);

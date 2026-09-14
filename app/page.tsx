@@ -6,11 +6,12 @@ import { useRouter } from 'next/navigation';
 import { Navbar } from '@/components/Navbar';
 import { Logo } from '@/components/Logo';
 import { RACKNSELL_CATEGORIES } from '@/lib/categories-data';
+import { INITIAL_PRODUCTS } from '@/lib/mock-data';
 import { 
   Shield, ShoppingBag, CheckCircle2, Truck, 
   ArrowRight, Sparkles, ChevronRight, Zap,
   Search, FileSearch, Building2, Layers,
-  Phone, Mail, Check, Star, Lock
+  Phone, Mail, Check, Star, Lock, Package
 } from 'lucide-react';
 
 export default function LandingPage() {
@@ -226,9 +227,11 @@ export default function LandingPage() {
                     </span>
                   </div>
 
-                  <h3 className="text-sm font-black text-slate-900 group-hover:text-blue-600 transition">
-                    {cat.name}
-                  </h3>
+                  <Link href={`/category/${cat.slug}`}>
+                    <h3 className="text-sm font-black text-slate-900 group-hover:text-blue-600 transition">
+                      {cat.name}
+                    </h3>
+                  </Link>
                   <p className="text-[11px] text-slate-500 line-clamp-2 mt-1 leading-relaxed">
                     {cat.description}
                   </p>
@@ -248,7 +251,7 @@ export default function LandingPage() {
                     {cat.featuredBrands.slice(0, 2).join(', ')}
                   </span>
                   <Link
-                    href={`/catalog?cat=${encodeURIComponent(cat.name)}`}
+                    href={`/category/${cat.slug}`}
                     className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1"
                   >
                     <span>View SKUs</span>
@@ -257,6 +260,100 @@ export default function LandingPage() {
                 </div>
               </div>
             ))}
+          </div>
+
+        </div>
+      </section>
+
+      {/* Featured Industrial Products Showcase */}
+      <section className="py-16 bg-white border-b border-slate-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+          
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2 text-xs font-bold text-emerald-600 uppercase tracking-wider">
+                <Sparkles className="w-4 h-4" />
+                <span>Pre-Negotiated Rate Contracts</span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight mt-1">
+                High-Volume MRO & Industrial Supplies
+              </h2>
+              <p className="text-xs text-slate-500 mt-1">
+                Direct OEM dispatch with factory test certificates, volume tier discounts, and automated 3-way matching.
+              </p>
+            </div>
+
+            <Link
+              href="/catalog"
+              className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1 shrink-0"
+            >
+              <span>Explore All Products</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {INITIAL_PRODUCTS.slice(0, 8).map((product) => {
+              const effectivePrice = product.contractPrice || product.basePrice;
+              return (
+                <div
+                  key={product.id}
+                  className="bg-white rounded-2xl border border-slate-200 shadow-xs hover:border-blue-400 hover:shadow-md transition flex flex-col justify-between overflow-hidden group"
+                >
+                  <div className="relative h-44 bg-slate-100 overflow-hidden">
+                    <Link href={`/product/${product.id}`} className="w-full h-full block">
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                      />
+                    </Link>
+                    <div className="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-md bg-blue-600/90 backdrop-blur-md text-white font-bold text-[10px]">
+                      {product.brand}
+                    </div>
+                    <div className="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-md bg-black/60 backdrop-blur-md text-white font-mono text-[10px]">
+                      MOQ: {product.moq} {product.unit}
+                    </div>
+                  </div>
+
+                  <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
+                    <div>
+                      <div className="flex items-center justify-between text-[10px] text-slate-400 font-mono mb-1">
+                        <span>{product.sku}</span>
+                        <span>{product.category}</span>
+                      </div>
+                      <Link href={`/product/${product.id}`}>
+                        <h3 className="text-xs font-bold text-slate-900 group-hover:text-blue-600 transition line-clamp-2 leading-snug">
+                          {product.name}
+                        </h3>
+                      </Link>
+                    </div>
+
+                    <div className="pt-2 border-t border-slate-100 flex items-baseline justify-between">
+                      <div>
+                        <span className="text-base font-black text-slate-900 font-mono">
+                          ₹{effectivePrice.toLocaleString('en-IN')}
+                        </span>
+                        <span className="text-[10px] text-slate-500 ml-1">/{product.unit}</span>
+                      </div>
+                      <span className="text-[10px] font-mono text-emerald-700 font-bold bg-emerald-50 px-1.5 py-0.5 rounded">
+                        +{product.gstRate}% GST
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2 pt-1">
+                      <Link
+                        href={`/product/${product.id}`}
+                        className="w-full py-2 bg-slate-900 hover:bg-black text-white rounded-xl text-xs font-bold text-center transition flex items-center justify-center gap-1.5 shadow-2xs"
+                      >
+                        <span>View Details & Tiers</span>
+                        <ArrowRight className="w-3 h-3" />
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
 
         </div>

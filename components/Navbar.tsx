@@ -6,13 +6,14 @@ import { usePathname, useRouter } from 'next/navigation';
 import { Logo } from './Logo';
 import { RoleSwitcher } from './RoleSwitcher';
 import { CartDrawer } from './CartDrawer';
+import { QuoteModal } from './QuoteModal';
 import { useReliableStore } from '@/lib/store';
 import { RACKNSELL_CATEGORIES } from '@/lib/categories-data';
 import { 
   Phone, Mail, Truck, Zap, FileSearch, Shield, 
   ShoppingCart, Search, ChevronDown, Menu, X, 
   User, Sparkles, Building2, Layers, ArrowRight,
-  ExternalLink, PanelLeftOpen
+  ExternalLink, PanelLeftOpen, HelpCircle
 } from 'lucide-react';
 
 export function Navbar({ onToggleSidebar }: { onToggleSidebar?: () => void }) {
@@ -21,6 +22,7 @@ export function Navbar({ onToggleSidebar }: { onToggleSidebar?: () => void }) {
   const { cart, currentUser } = useReliableStore();
 
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
   const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
   const [activeCategoryIndex, setActiveCategoryIndex] = useState(0);
   const [searchCategory, setSearchCategory] = useState('ALL');
@@ -104,13 +106,15 @@ export function Navbar({ onToggleSidebar }: { onToggleSidebar?: () => void }) {
 
             <span className="text-slate-700 hidden md:inline">|</span>
 
-            <Link 
-              href="/rfq?tab=create" 
-              className="hidden md:flex items-center gap-1 text-slate-300 hover:text-white transition"
+            <button 
+              type="button"
+              onClick={() => setIsQuoteModalOpen(true)}
+              className="hidden md:flex items-center gap-1 text-slate-300 hover:text-white transition cursor-pointer"
+              title="Request instant B2B quotation"
             >
               <FileSearch className="w-3 h-3 text-indigo-400" />
-              <span>Submit RFQ</span>
-            </Link>
+              <span>Quotation (RFQ)</span>
+            </button>
 
             <span className="text-slate-700 hidden md:inline">|</span>
 
@@ -285,7 +289,7 @@ export function Navbar({ onToggleSidebar }: { onToggleSidebar?: () => void }) {
                           key={cat.id}
                           onMouseEnter={() => setActiveCategoryIndex(idx)}
                           onClick={() => {
-                            router.push(`/catalog?cat=${encodeURIComponent(cat.name)}`);
+                            router.push(`/category/${cat.slug}`);
                             setIsMegaMenuOpen(false);
                           }}
                           className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-left text-xs font-semibold transition cursor-pointer ${
@@ -317,7 +321,7 @@ export function Navbar({ onToggleSidebar }: { onToggleSidebar?: () => void }) {
                       </div>
 
                       <Link
-                        href={`/catalog?cat=${encodeURIComponent(selectedCategory.name)}`}
+                        href={`/category/${selectedCategory.slug}`}
                         onClick={() => setIsMegaMenuOpen(false)}
                         className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1 group"
                       >
@@ -504,6 +508,9 @@ export function Navbar({ onToggleSidebar }: { onToggleSidebar?: () => void }) {
 
       {/* Cart Drawer Modal */}
       <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+
+      {/* Sourcing RFQ Quotation Modal */}
+      <QuoteModal isOpen={isQuoteModalOpen} onClose={() => setIsQuoteModalOpen(false)} />
     </>
   );
 }

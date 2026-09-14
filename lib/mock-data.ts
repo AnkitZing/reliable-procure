@@ -94,6 +94,19 @@ export const INITIAL_COMPANIES: Company[] = [
     status: 'ACTIVE',
     billingAddress: 'Okhla Industrial Estate, Phase III, New Delhi 110020',
     state: 'Delhi'
+  },
+  {
+    id: 'comp-ven-03',
+    name: 'Om Fire Services',
+    gstin: '07AABCO4829K1Z5',
+    pan: 'AABCO4829K',
+    type: 'VENDOR',
+    creditLimit: 0,
+    creditUsed: 0,
+    paymentTerms: 'Net 30',
+    status: 'ACTIVE',
+    billingAddress: 'Sector 18, Electronic City, Udyog Vihar, Gurugram, Haryana 122015',
+    state: 'Haryana'
   }
 ];
 
@@ -510,7 +523,181 @@ export const INITIAL_PRODUCTS: Product[] = [
       { minQty: 100, price: 395 }
     ],
     vendorId: 'comp-ven-02',
-    vendorName: 'Karam Safety Solutions'
+    vendorName: 'Karam Safety Solutions',
+    specifications: {
+      'Dimensions': '12 x 18 inches (300 x 450 mm)',
+      'Substrate Material': 'Rigid Aluminium Composite Panel (ACP 3mm)',
+      'Reflective Grade': 'Class 1 / Type IV High Intensity Prismatic (HIP)',
+      'Language': 'Bilingual (English / Hindi)',
+      'Standards': 'OSHA 1910.145 / ANSI Z535 Compliant'
+    },
+    standards: ['OSHA 1910.145', 'ANSI Z535', 'IS 9457'],
+    features: ['Retro-reflective night visibility', 'Weatherproof UV-cured ink coating', 'Pre-drilled 4-corner mounting holes'],
+    leadTimeDays: 2,
+    warranty: '3 Years UV Fade Guarantee',
+    origin: 'India'
+  },
+  {
+    id: 'prod-019',
+    name: 'Fire Extinguisher Refilling ABC MAP90 6kg With HP Testing, Nos',
+    sku: 'RS077134',
+    category: 'Safety & PPE',
+    description: 'Complete industrial overhaul, ultrasonic hydrostatic pressure testing up to 35 bar, refilling with Mono Ammonium Phosphate (MAP 90%) powder, nitrogen recharging to 15 bar, replacement of valve seals, discharge hose, O-rings, safety pin, tamper seal, and ISI compliance inspection sticker.',
+    brand: 'Om Fire Services',
+    basePrice: 1050,
+    contractPrice: 850,
+    hsnCode: '842410',
+    gstRate: 18,
+    unit: 'Nos',
+    moq: 5,
+    stock: 2500,
+    image: 'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?auto=format&fit=crop&w=600&q=80',
+    gallery: [
+      'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1603555501671-8f96b3fce8b4?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1578873375972-00b86a87747e?auto=format&fit=crop&w=800&q=80'
+    ],
+    tiers: [
+      { minQty: 5, price: 850 },
+      { minQty: 20, price: 780 },
+      { minQty: 50, price: 720 }
+    ],
+    vendorId: 'comp-ven-03',
+    vendorName: 'Om Fire Services',
+    specifications: {
+      'Extinguishing Agent': 'Mono Ammonium Phosphate (MAP 90% UL Listed Powder)',
+      'Capacity': '6 kg Net Chemical Charge',
+      'Testing Method': 'Hydrostatic Stretch Testing @ 35 kgf/cm²',
+      'Propellant Gas': 'Dry Nitrogen Grade 1 (Purity 99.99%)',
+      'Operating Pressure': '15 Bar at 27°C',
+      'Applicable Classes': 'Class A (Solids), Class B (Flammable Liquids), Class C (Gases) and Electrical Fires',
+      'Certification': 'Conforms to IS 2190 & IS 15683 Annual Maintenance Guidelines'
+    },
+    standards: ['IS 2190 Code of Practice', 'IS 15683', 'PESO Approved Refilling Center'],
+    features: ['Includes Free Pick & Drop at Enterprise Facility', 'Free 1-Year Leakage Warranty', 'Pre & Post Hydrostatic Test Certificate included'],
+    leadTimeDays: 1,
+    warranty: '12 Months Recharging Warranty',
+    origin: 'India'
+  },
+  {
+    id: 'prod-020',
+    name: 'Fire Extinguisher Refilling Clean Agent FE36 Modular 5kg With HP Testing, Nos',
+    sku: 'RS077146',
+    category: 'Safety & PPE',
+    description: 'Clean Agent HFC-236fa (FE-36) residue-free gas refilling for ceiling-mounted modular automatic server room and electrical panel fire suppression systems. Includes pneumatic pressure leak testing, quartzoid bulb thermal trigger replacement (68°C/79°C), high-pressure hydro testing, and certification.',
+    brand: 'Om Fire Services',
+    basePrice: 14500,
+    contractPrice: 12609,
+    hsnCode: '842410',
+    gstRate: 18,
+    unit: 'Nos',
+    moq: 1,
+    stock: 420,
+    image: 'https://images.unsplash.com/photo-1603555501671-8f96b3fce8b4?auto=format&fit=crop&w=600&q=80',
+    gallery: [
+      'https://images.unsplash.com/photo-1603555501671-8f96b3fce8b4?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?auto=format&fit=crop&w=800&q=80'
+    ],
+    tiers: [
+      { minQty: 1, price: 12609 },
+      { minQty: 5, price: 11950 },
+      { minQty: 15, price: 11200 }
+    ],
+    vendorId: 'comp-ven-03',
+    vendorName: 'Om Fire Services',
+    specifications: {
+      'Extinguishing Agent': 'FE-36 (Hexafluoropropane HFC-236fa Dupont/Chemours)',
+      'Capacity': '5 kg Modular Automatic Ceiling Mount',
+      'Thermal Trigger Temperature': '68°C Red Quartz Bulb (Rated for Server Cabinets)',
+      'Ozone Depletion Potential (ODP)': 'Zero (0) ODP - Eco Friendly Clean Agent',
+      'Electrically Non-Conductive': 'Safe up to 100,000 Volts (100kV)',
+      'Effective Coverage Area': '6.0 to 8.5 cubic meters',
+      'Testing Standard': 'IS 15683 / UL 2129 Clean Agent System Compliance'
+    },
+    standards: ['IS 15683', 'UL 2129 Listed Gas', 'NFPA 2001 Clean Agent Standards'],
+    features: ['Zero Residue - 100% Safe for High-End Data Centers & IT Racks', 'Fast Acting Thermal Sensing System', 'Certified Non-Corrosive to Electronic PCBs'],
+    leadTimeDays: 2,
+    warranty: '36 Months Gas Stability Warranty',
+    origin: 'India'
+  },
+  {
+    id: 'prod-021',
+    name: 'Ceasefire 4kg ABC Stored Pressure Fire Extinguisher (IS 15683 Certified)',
+    sku: 'SAF-EXT-021',
+    category: 'Safety & PPE',
+    description: 'High performance multipurpose ABC dry powder fire extinguisher engineered with deep-drawn steel body, brass forged valve, magnetic pressure gauge, and ISI marking. Suitable for commercial buildings, factories, and warehouses.',
+    brand: 'Ceasefire',
+    basePrice: 2950,
+    contractPrice: 2450,
+    hsnCode: '842410',
+    gstRate: 18,
+    unit: 'Pieces',
+    moq: 2,
+    stock: 850,
+    image: 'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?auto=format&fit=crop&w=600&q=80',
+    gallery: [
+      'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1603555501671-8f96b3fce8b4?auto=format&fit=crop&w=800&q=80'
+    ],
+    tiers: [
+      { minQty: 2, price: 2450 },
+      { minQty: 10, price: 2280 },
+      { minQty: 30, price: 2100 }
+    ],
+    vendorId: 'comp-ven-03',
+    vendorName: 'Om Fire Services',
+    specifications: {
+      'Fire Rating': '3A : 89B',
+      'Discharge Range': 'More than 4 meters',
+      'Discharge Duration': 'Minimum 15 seconds',
+      'Extinguishing Medium': 'Siliconized MAP 90 Powder',
+      'Cylinder Burst Pressure': 'Above 55 bar',
+      'Corrosion Protection': 'Internal and external electrostatic pure polyester powder coating'
+    },
+    standards: ['BIS IS:15683', 'CE 0029', 'ISO 9001:2015 Certified Manufacturing'],
+    features: ['EPDM Heavy Duty Braided Discharge Hose', 'Wall Mounting Bracket and Hardware Included', '5-Year Shelf Life with Zero Internal Rust'],
+    leadTimeDays: 1,
+    warranty: '5 Years Manufacturer Warranty',
+    origin: 'India'
+  },
+  {
+    id: 'prod-022',
+    name: 'Ceasefire 4.5kg CO2 Portable Fire Extinguisher (Wheel Type Valve)',
+    sku: 'SAF-CO2-022',
+    category: 'Safety & PPE',
+    description: 'Seamless manganese steel cylinder filled with industrial grade liquid carbon dioxide for extinguishing Class B flammable liquid fires and energized Class C electrical control room hazard fires with zero collateral residue.',
+    brand: 'Ceasefire',
+    basePrice: 6600,
+    contractPrice: 5800,
+    hsnCode: '842410',
+    gstRate: 18,
+    unit: 'Pieces',
+    moq: 1,
+    stock: 310,
+    image: 'https://images.unsplash.com/photo-1603555501671-8f96b3fce8b4?auto=format&fit=crop&w=600&q=80',
+    gallery: [
+      'https://images.unsplash.com/photo-1603555501671-8f96b3fce8b4?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?auto=format&fit=crop&w=800&q=80'
+    ],
+    tiers: [
+      { minQty: 1, price: 5800 },
+      { minQty: 5, price: 5450 },
+      { minQty: 15, price: 5100 }
+    ],
+    vendorId: 'comp-ven-03',
+    vendorName: 'Om Fire Services',
+    specifications: {
+      'Fire Rating': '21B : C',
+      'Cylinder Body': 'Seamless Manganese Steel (IS:7285 / PESO CCOE Approved)',
+      'Working Pressure': '150 bar @ 15°C',
+      'Test Pressure': '250 bar (Hydrostatic Stretch Tested)',
+      'Discharge Horn': 'Non-conductive frost-free diffuser discharge horn with handle'
+    },
+    standards: ['IS 2878 : 2004', 'PESO / CCOE Approved Cylinder', 'CE Certified Valve'],
+    features: ['Zero residue gas discharge', 'Frost-free safety discharge horn', 'Heavy duty forged brass wheel valve'],
+    leadTimeDays: 2,
+    warranty: '5 Years Cylinder Warranty',
+    origin: 'India'
   }
 ];
 

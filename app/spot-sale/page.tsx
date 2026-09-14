@@ -80,11 +80,13 @@ export default function SpotSalePage() {
               >
                 {/* Image & Discount Badge */}
                 <div className="relative h-44 bg-slate-100 overflow-hidden">
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
-                  />
+                  <Link href={`/product/${item.id}`} className="w-full h-full block">
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                    />
+                  </Link>
                   <div className="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-lg bg-red-600 text-white font-black text-xs flex items-center gap-1 shadow-md">
                     <Percent className="w-3 h-3" />
                     <span>{item.spotDiscount}% OFF</span>
@@ -101,9 +103,11 @@ export default function SpotSalePage() {
                       <span>{item.brand}</span>
                       <span className="font-mono text-[10px]">{item.sku}</span>
                     </div>
-                    <h3 className="text-xs font-bold text-slate-900 line-clamp-2 leading-snug">
-                      {item.name}
-                    </h3>
+                    <Link href={`/product/${item.id}`}>
+                      <h3 className="text-xs font-bold text-slate-900 group-hover:text-amber-600 transition line-clamp-2 leading-snug">
+                        {item.name}
+                      </h3>
+                    </Link>
                   </div>
 
                   {/* Stock Meter */}

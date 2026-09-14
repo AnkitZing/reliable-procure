@@ -163,6 +163,7 @@ function AdminPortalContent() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activeModule, setActiveModule] = useState(initialModule);
   const [selectedOrderIndex, setSelectedOrderIndex] = useState(0);
+  const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
 
   // Search and filters for tables
   const [filterQuery, setFilterQuery] = useState('');
@@ -619,13 +620,23 @@ function AdminPortalContent() {
                   ))}
                 </div>
 
-                <button
-                  onClick={() => window.print()}
-                  className="hidden sm:flex items-center gap-1 px-2.5 py-1 bg-slate-100 hover:bg-slate-200 rounded text-xs font-bold text-slate-700"
-                >
-                  <Printer className="w-3.5 h-3.5" />
-                  <span>Print Details</span>
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setIsInvoiceModalOpen(true)}
+                    className="flex items-center gap-1.5 px-3 py-1 bg-[#20638f] text-white hover:bg-[#1b547a] rounded text-xs font-bold transition cursor-pointer shadow-xs"
+                  >
+                    <FileText className="w-3.5 h-3.5" />
+                    <span>View GST Tax Invoice</span>
+                  </button>
+
+                  <button
+                    onClick={() => window.print()}
+                    className="hidden sm:flex items-center gap-1 px-2.5 py-1 bg-slate-100 hover:bg-slate-200 rounded text-xs font-bold text-slate-700"
+                  >
+                    <Printer className="w-3.5 h-3.5" />
+                    <span>Print Details</span>
+                  </button>
+                </div>
               </div>
 
               {/* Title Matching Screenshot */}
@@ -670,30 +681,45 @@ function AdminPortalContent() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-200 text-slate-800">
-                    {selectedOrder.items.map((item, idx) => (
-                      <tr key={idx} className="hover:bg-slate-50 transition">
-                        
-                        {/* Product Name with Thumbnail & SKU */}
-                        <td className="p-3 border-r border-slate-200">
-                          <div className="flex items-start gap-3">
-                            <img
-                              src={item.image}
-                              alt={item.name}
-                              className="w-12 h-14 object-contain bg-slate-50 p-1 border border-slate-200 rounded shrink-0"
-                            />
-                            <div className="space-y-0.5">
-                              <div className="font-mono text-[11px] font-bold text-slate-700">
-                                {item.sku}
-                              </div>
-                              <div className="font-bold text-slate-900 leading-snug">
-                                {item.name}
-                              </div>
-                              <div className="text-[10px] text-slate-500 italic">
-                                {item.description}
+                    {selectedOrder.items.map((item, idx) => {
+                      const matchedProduct = products.find(p => p.sku === item.sku || p.name.toLowerCase().includes(item.name.slice(0, 15).toLowerCase()));
+                      const productHref = matchedProduct ? `/product/${matchedProduct.id}` : `/product/${item.sku}`;
+
+                      return (
+                        <tr key={idx} className="hover:bg-slate-50 transition">
+                          
+                          {/* Product Name with Thumbnail & SKU */}
+                          <td className="p-3 border-r border-slate-200">
+                            <div className="flex items-start gap-3">
+                              <Link href={productHref} target="_blank" className="shrink-0 group" title="Open product detail page">
+                                <img
+                                  src={item.image}
+                                  alt={item.name}
+                                  className="w-12 h-14 object-contain bg-slate-50 p-1 border border-slate-200 rounded group-hover:border-blue-500 transition"
+                                />
+                              </Link>
+                              <div className="space-y-0.5">
+                                <Link 
+                                  href={productHref} 
+                                  target="_blank"
+                                  className="font-mono text-[11px] font-bold text-blue-700 hover:underline inline-flex items-center gap-1"
+                                >
+                                  <span>{item.sku}</span>
+                                  <ExternalLink className="w-2.5 h-2.5 opacity-60" />
+                                </Link>
+                                <Link 
+                                  href={productHref} 
+                                  target="_blank"
+                                  className="font-bold text-slate-900 hover:text-blue-600 leading-snug block transition"
+                                >
+                                  {item.name}
+                                </Link>
+                                <div className="text-[10px] text-slate-500 italic">
+                                  {item.description}
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        </td>
+                          </td>
 
                         {/* Unit Price (excl GST) */}
                         <td className="p-3 border-r border-slate-200 text-right font-mono text-slate-900">
@@ -732,7 +758,8 @@ function AdminPortalContent() {
                         </td>
 
                       </tr>
-                    ))}
+                    );
+                  })}
                   </tbody>
                 </table>
               </div>
@@ -1577,6 +1604,202 @@ function AdminPortalContent() {
 
         </main>
       </div>
+
+      {/* ========================================================================= */}
+      {/* MODAL: OFFICIAL GST TAX INVOICE & PO RECEIPT (Concentrix & Om Fire) */}
+      {/* ========================================================================= */}
+      {isInvoiceModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150">
+          <div 
+            className="bg-white rounded-2xl max-w-4xl w-full max-h-[94vh] overflow-y-auto shadow-2xl border border-slate-300 p-6 sm:p-8 space-y-6 text-slate-800"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Top Toolbar */}
+            <div className="flex items-center justify-between pb-4 border-b border-slate-200">
+              <div className="flex items-center gap-2">
+                <span className="px-2.5 py-1 rounded bg-blue-100 text-[#20638f] text-xs font-black uppercase">
+                  GST Tax Invoice &bull; Original for Recipient
+                </span>
+                <span className="text-xs text-slate-500 font-mono">Invoice #{selectedOrder.masterOrderId}-INV</span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => window.print()}
+                  className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-lg text-xs font-bold text-slate-700 flex items-center gap-1.5 transition cursor-pointer"
+                >
+                  <Printer className="w-3.5 h-3.5" />
+                  <span>Print</span>
+                </button>
+                <button
+                  onClick={() => setIsInvoiceModalOpen(false)}
+                  className="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-100 transition cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Letterhead */}
+            <div className="grid grid-cols-2 gap-6 pb-4 border-b border-slate-200 text-xs">
+              <div>
+                <h2 className="text-lg font-black text-slate-900 tracking-tight">
+                  {selectedOrder.supplierName}
+                </h2>
+                <p className="text-slate-600 mt-1">
+                  Plot 48, Sector 18, Electronic City, Udyog Vihar<br />
+                  Gurugram, Haryana &bull; 122015<br />
+                  GSTIN: <strong className="font-mono text-slate-900">07AABCO4829K1Z5</strong> &bull; PAN: <strong className="font-mono text-slate-900">AABCO4829K</strong><br />
+                  State: <strong>Haryana (Code 07)</strong>
+                </p>
+              </div>
+
+              <div className="text-right space-y-1">
+                <div className="font-mono text-xs">
+                  <span className="text-slate-500">Invoice No:</span> <strong className="text-slate-900">INV-2026-OM-{selectedOrder.masterOrderId}</strong>
+                </div>
+                <div className="font-mono text-xs">
+                  <span className="text-slate-500">Invoice Date:</span> <strong className="text-slate-900">{selectedOrder.orderDate}</strong>
+                </div>
+                <div className="font-mono text-xs">
+                  <span className="text-slate-500">Buyer PO Ref:</span> <strong className="text-blue-700">{selectedOrder.masterOrderId}</strong>
+                </div>
+                <div className="font-mono text-xs">
+                  <span className="text-slate-500">Order ID:</span> <strong className="text-slate-700">{selectedOrder.orderId}</strong>
+                </div>
+                <div className="text-[10px] text-slate-500">
+                  Place of Supply: <strong>Haryana (07) &bull; Intra-State</strong>
+                </div>
+              </div>
+            </div>
+
+            {/* Bill To & Ship To */}
+            <div className="grid grid-cols-2 gap-4 p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs">
+              <div>
+                <span className="font-black text-slate-400 uppercase text-[10px] tracking-wider block mb-1">
+                  Billed To (Enterprise Buyer):
+                </span>
+                <strong className="text-slate-900 text-sm">{selectedOrder.buyerName}</strong>
+                <p className="text-slate-600 mt-0.5">
+                  Building 14, Tower C, DLF Cyber City, Phase 2<br />
+                  Gurugram, Haryana &bull; 122002<br />
+                  GSTIN: <strong className="font-mono text-slate-900">07AAACC2389P1ZM</strong>
+                </p>
+              </div>
+
+              <div>
+                <span className="font-black text-slate-400 uppercase text-[10px] tracking-wider block mb-1">
+                  Shipped To / Consignee:
+                </span>
+                <strong className="text-slate-900 text-sm">{selectedOrder.buyerName} - Facilities & Safety</strong>
+                <p className="text-slate-600 mt-0.5">
+                  Gate No. 2, Security & EHS Store, DLF Cyber City<br />
+                  Gurugram, Haryana &bull; 122002<br />
+                  Delivery Contact: Facilities Manager (+91 7290090309)
+                </p>
+              </div>
+            </div>
+
+            {/* Itemized Table */}
+            <div className="border border-slate-200 rounded-xl overflow-hidden text-xs">
+              <table className="w-full text-left border-collapse">
+                <thead className="bg-[#f8fafc] text-slate-700 font-bold border-b border-slate-200">
+                  <tr>
+                    <th className="p-2.5 border-r border-slate-200 w-10 text-center">#</th>
+                    <th className="p-2.5 border-r border-slate-200">Description of Goods / Services</th>
+                    <th className="p-2.5 border-r border-slate-200 text-center">HSN/SAC</th>
+                    <th className="p-2.5 border-r border-slate-200 text-center">Qty</th>
+                    <th className="p-2.5 border-r border-slate-200 text-right">Rate (₹)</th>
+                    <th className="p-2.5 border-r border-slate-200 text-right">Taxable (₹)</th>
+                    <th className="p-2.5 border-r border-slate-200 text-right">CGST (9%)</th>
+                    <th className="p-2.5 border-r border-slate-200 text-right">SGST (9%)</th>
+                    <th className="p-2.5 text-right font-black">Total (₹)</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200 font-mono text-[11px]">
+                  {selectedOrder.items.map((it, i) => {
+                    const taxable = it.unitPriceExclGst * it.quantity;
+                    const cgst = taxable * 0.09;
+                    const sgst = taxable * 0.09;
+                    return (
+                      <tr key={i} className="hover:bg-slate-50">
+                        <td className="p-2.5 border-r border-slate-200 text-center text-slate-500">{i + 1}</td>
+                        <td className="p-2.5 border-r border-slate-200 font-sans">
+                          <strong className="text-slate-900 block">{it.name}</strong>
+                          <span className="text-[10px] text-slate-500">SKU: {it.sku} &bull; {it.description}</span>
+                        </td>
+                        <td className="p-2.5 border-r border-slate-200 text-center">842410</td>
+                        <td className="p-2.5 border-r border-slate-200 text-center font-bold">{it.quantity} {it.unit}</td>
+                        <td className="p-2.5 border-r border-slate-200 text-right">{it.unitPriceExclGst.toFixed(2)}</td>
+                        <td className="p-2.5 border-r border-slate-200 text-right font-bold">{taxable.toFixed(2)}</td>
+                        <td className="p-2.5 border-r border-slate-200 text-right text-slate-600">{cgst.toFixed(2)}</td>
+                        <td className="p-2.5 border-r border-slate-200 text-right text-slate-600">{sgst.toFixed(2)}</td>
+                        <td className="p-2.5 text-right font-black text-slate-900">{it.totalAmountInclGst.toFixed(2)}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Calculations & Bank Summary */}
+            <div className="grid grid-cols-2 gap-6 text-xs">
+              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+                <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider block">
+                  Bank Transfer & Statutory Declarations:
+                </span>
+                <p className="text-[11px] text-slate-600 leading-relaxed">
+                  Bank: <strong>HDFC Bank Ltd &bull; Corporate Branch</strong><br />
+                  A/C Name: <strong>Om Fire Services Operating A/C</strong><br />
+                  A/C No: <strong className="font-mono">50200049318291</strong> &bull; IFSC: <strong className="font-mono">HDFC0001234</strong><br />
+                  Terms: Net 30 Days from date of invoice submission.
+                </p>
+                <div className="pt-2 border-t border-slate-200 text-[10px] text-slate-500 italic">
+                  &ldquo;Certified that the particulars given above are true and correct and the amount indicated represents the price actually charged.&rdquo;
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5 text-xs">
+                  <div className="flex justify-between text-slate-600">
+                    <span>Total Taxable Value:</span>
+                    <span className="font-mono font-bold">
+                      ₹{selectedOrder.items.reduce((s, it) => s + (it.unitPriceExclGst * it.quantity), 0).toFixed(2)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-slate-600">
+                    <span>Central GST (CGST 9%):</span>
+                    <span className="font-mono">
+                      ₹{(selectedOrder.items.reduce((s, it) => s + (it.unitPriceExclGst * it.quantity), 0) * 0.09).toFixed(2)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-slate-600">
+                    <span>State GST (SGST 9%):</span>
+                    <span className="font-mono">
+                      ₹{(selectedOrder.items.reduce((s, it) => s + (it.unitPriceExclGst * it.quantity), 0) * 0.09).toFixed(2)}
+                    </span>
+                  </div>
+                  <div className="pt-2 border-t border-slate-200 flex justify-between text-base font-black text-slate-900">
+                    <span>Invoice Value (INR):</span>
+                    <span className="font-mono text-[#20638f]">
+                      ₹{selectedOrder.items.reduce((s, it) => s + it.totalAmountInclGst, 0).toFixed(2)}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="text-right pt-2">
+                  <div className="text-[10px] text-slate-400 uppercase tracking-wider font-bold">For {selectedOrder.supplierName}</div>
+                  <div className="h-10 flex items-center justify-end font-script text-slate-700 italic text-sm">
+                    Authorized Signatory &bull; Digitally Signed
+                  </div>
+                  <div className="text-[10px] text-slate-500 font-mono">DSC-07-2026-OM-9041</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      )}
 
     </div>
   );
