@@ -78,7 +78,7 @@ interface ReliableStoreContextType {
 const ReliableContext = createContext<ReliableStoreContextType | null>(null);
 
 export function ReliableProvider({ children }: { children: React.ReactNode }) {
-  const [currentRole, setCurrentRoleState] = useState<Role>('SUPER_ADMIN');
+  const [currentRole, setCurrentRoleState] = useState<Role>('BUYER');
   const [cart, setCart] = useState<CartItem[]>([]);
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
   const [requisitions, setRequisitions] = useState<Requisition[]>(INITIAL_REQUISITIONS);
@@ -86,12 +86,12 @@ export function ReliableProvider({ children }: { children: React.ReactNode }) {
   const [rfqs, setRfqs] = useState<RFQ[]>(INITIAL_RFQS);
   const [matches, setMatches] = useState<ThreeWayMatch[]>(INITIAL_MATCHES);
   const [companies, setCompanies] = useState<Company[]>(INITIAL_COMPANIES);
-  const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
 
   // Initialize once on mount
   useEffect(() => {
-    const storedRole = getStored<Role>(STORAGE_KEYS.CURRENT_ROLE, 'SUPER_ADMIN');
+    const storedRole = getStored<Role>(STORAGE_KEYS.CURRENT_ROLE, 'BUYER');
     const storedCart = getStored<CartItem[]>(STORAGE_KEYS.CART, []);
     const storedProducts = getStored<Product[]>(STORAGE_KEYS.PRODUCTS, INITIAL_PRODUCTS);
     
@@ -112,7 +112,7 @@ export function ReliableProvider({ children }: { children: React.ReactNode }) {
     storedCompanies.forEach(c => compMap.set(c.id, c));
     const mergedCompanies = Array.from(compMap.values());
 
-    const storedAuth = getStored<boolean>(`${STORAGE_PREFIX}auth`, true);
+    const storedAuth = getStored<boolean>(`${STORAGE_PREFIX}auth`, false);
 
     setCurrentRoleState(storedRole);
     setCart(storedCart);
@@ -129,6 +129,8 @@ export function ReliableProvider({ children }: { children: React.ReactNode }) {
   const setRole = (role: Role) => {
     setCurrentRoleState(role);
     saveStored(STORAGE_KEYS.CURRENT_ROLE, role);
+    setIsAuthenticated(true);
+    saveStored(`${STORAGE_PREFIX}auth`, true);
   };
 
   const login = (email: string, password?: string) => {
@@ -546,7 +548,8 @@ export function ReliableProvider({ children }: { children: React.ReactNode }) {
   // Reset database to initial demo state
   const resetDemoData = () => {
     localStorage.clear();
-    setCurrentRoleState('SUPER_ADMIN');
+    setCurrentRoleState('BUYER');
+    setIsAuthenticated(false);
     setCart([]);
     setProducts(INITIAL_PRODUCTS);
     setRequisitions(INITIAL_REQUISITIONS);

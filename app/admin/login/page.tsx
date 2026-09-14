@@ -39,8 +39,8 @@ export default function AdminLoginPage() {
     setRole(role);
     if (typeof window !== 'undefined') {
       try {
-        localStorage.setItem('reliable_v2_role', JSON.stringify(role));
-        localStorage.setItem('reliable_v2_auth', JSON.stringify(true));
+        localStorage.setItem('reliable_v3_role', JSON.stringify(role));
+        localStorage.setItem('reliable_v3_auth', JSON.stringify(true));
       } catch (e) {
         console.error(e);
       }
@@ -81,8 +81,8 @@ export default function AdminLoginPage() {
     setRole(targetRole);
     if (typeof window !== 'undefined') {
       try {
-        localStorage.setItem('reliable_v2_role', JSON.stringify(targetRole));
-        localStorage.setItem('reliable_v2_auth', JSON.stringify(true));
+        localStorage.setItem('reliable_v3_role', JSON.stringify(targetRole));
+        localStorage.setItem('reliable_v3_auth', JSON.stringify(true));
       } catch (err) {
         console.error(err);
       }

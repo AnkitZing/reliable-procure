@@ -4,7 +4,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Logo } from './Logo';
-import { RoleSwitcher } from './RoleSwitcher';
 import { CartDrawer } from './CartDrawer';
 import { QuoteModal } from './QuoteModal';
 import { useReliableStore } from '@/lib/store';
@@ -13,17 +12,18 @@ import {
   Phone, Mail, Truck, Zap, FileSearch, Shield, 
   ShoppingCart, Search, ChevronDown, Menu, X, 
   User, Sparkles, Building2, Layers, ArrowRight,
-  ExternalLink, PanelLeftOpen, HelpCircle
+  ExternalLink, PanelLeftOpen, HelpCircle, LogOut
 } from 'lucide-react';
 
 export function Navbar({ onToggleSidebar }: { onToggleSidebar?: () => void }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { cart, currentUser } = useReliableStore();
+  const { cart, currentUser, isAuthenticated, logout } = useReliableStore();
 
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
   const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [activeCategoryIndex, setActiveCategoryIndex] = useState(0);
   const [searchCategory, setSearchCategory] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
@@ -199,11 +199,6 @@ export function Navbar({ onToggleSidebar }: { onToggleSidebar?: () => void }) {
             {/* Right: Actions & Profile */}
             <div className="flex items-center gap-2 sm:gap-3 shrink-0">
               
-              {/* Role Switcher Pill */}
-              <div className="hidden lg:block">
-                <RoleSwitcher />
-              </div>
-
               {/* RFQ / Sourcing Desk Direct Button */}
               <Link
                 href="/rfq"
@@ -227,20 +222,64 @@ export function Navbar({ onToggleSidebar }: { onToggleSidebar?: () => void }) {
                 )}
               </button>
 
-              {/* User Capsule */}
-              <div className="hidden sm:flex items-center gap-2 pl-2 border-l border-slate-200">
-                <div className="w-7 h-7 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600">
+              {/* User Sign In / Profile Dropdown */}
+              {!isAuthenticated ? (
+                <Link
+                  href="/admin/login"
+                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition shadow-xs cursor-pointer ml-1"
+                >
                   <User className="w-3.5 h-3.5" />
-                </div>
-                <div className="text-left leading-tight hidden xl:block">
-                  <div className="text-xs font-bold text-slate-900 truncate max-w-[110px]">
-                    {currentUser.name}
+                  <span>Sign In</span>
+                </Link>
+              ) : (
+                <div className="relative group pl-2 border-l border-slate-200">
+                  <button
+                    onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                    className="flex items-center gap-2 p-1 rounded-xl hover:bg-slate-100 transition cursor-pointer"
+                  >
+                    <div className="w-7 h-7 rounded-full bg-blue-100 text-blue-700 font-bold text-xs flex items-center justify-center border border-blue-200">
+                      {currentUser.name ? currentUser.name.charAt(0) : 'U'}
+                    </div>
+                    <div className="text-left leading-tight hidden xl:block">
+                      <div className="text-xs font-bold text-slate-900 truncate max-w-[110px]">
+                        {currentUser.name}
+                      </div>
+                      <div className="text-[10px] text-slate-500 font-medium truncate max-w-[110px]">
+                        {currentUser.role.replace('_', ' ')}
+                      </div>
+                    </div>
+                    <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+                  </button>
+
+                  {/* Dropdown Menu */}
+                  <div className="absolute right-0 mt-1 w-52 bg-white rounded-xl shadow-xl border border-slate-200 py-1.5 text-xs hidden group-hover:block z-50 animate-in fade-in duration-100">
+                    <div className="px-3 py-2 border-b border-slate-100">
+                      <div className="font-bold text-slate-900">{currentUser.name}</div>
+                      <div className="text-[11px] text-slate-500 truncate">{currentUser.email}</div>
+                      <div className="text-[10px] text-blue-600 font-bold mt-0.5">{currentUser.companyName}</div>
+                    </div>
+                    <Link href="/requisitions" className="block px-3 py-1.5 hover:bg-slate-50 text-slate-700 font-medium">
+                      My Requisitions (PR)
+                    </Link>
+                    <Link href="/purchase-orders" className="block px-3 py-1.5 hover:bg-slate-50 text-slate-700 font-medium">
+                      Purchase Orders
+                    </Link>
+                    {currentUser.role === 'SUPER_ADMIN' && (
+                      <Link href="/admin" className="block px-3 py-1.5 hover:bg-slate-50 text-purple-700 font-bold">
+                        Admin Control Desk &rarr;
+                      </Link>
+                    )}
+                    <div className="border-t border-slate-100 my-1"></div>
+                    <button
+                      onClick={() => logout()}
+                      className="w-full text-left px-3 py-1.5 hover:bg-red-50 text-red-600 font-bold flex items-center gap-1.5 cursor-pointer"
+                    >
+                      <LogOut className="w-3.5 h-3.5" />
+                      <span>Sign Out</span>
+                    </button>
                   </div>
-                  <div className="text-[10px] text-slate-500 font-medium truncate max-w-[110px]">
-                    {currentUser.companyName}
-                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Mobile Drawer Toggle */}
               <button
@@ -485,7 +524,30 @@ export function Navbar({ onToggleSidebar }: { onToggleSidebar?: () => void }) {
             </form>
 
             <div className="border-t border-slate-100 pt-3">
-              <RoleSwitcher />
+              {!isAuthenticated ? (
+                <Link
+                  href="/admin/login"
+                  onClick={() => setIsMobileNavOpen(false)}
+                  className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-xs"
+                >
+                  <User className="w-4 h-4" />
+                  <span>Sign In to Enterprise Portal</span>
+                </Link>
+              ) : (
+                <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+                  <div>
+                    <div className="font-bold text-slate-900 text-xs">{currentUser.name}</div>
+                    <div className="text-[10px] text-slate-500">{currentUser.role.replace('_', ' ')}</div>
+                  </div>
+                  <button
+                    onClick={() => { logout(); setIsMobileNavOpen(false); }}
+                    className="px-2.5 py-1 bg-red-100 hover:bg-red-200 text-red-700 rounded text-xs font-bold flex items-center gap-1"
+                  >
+                    <LogOut className="w-3 h-3" />
+                    <span>Sign Out</span>
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Quick Links Grid */}
