@@ -53,6 +53,8 @@ interface ReliableStoreContextType {
   clearCart: () => void;
   products: Product[];
   addProduct: (product: Omit<Product, 'id'>) => void;
+  bulkAddProducts: (newProducts: Omit<Product, 'id'>[]) => void;
+  adjustProductStock: (productId: string, newStock: number) => void;
   requisitions: Requisition[];
   createRequisitionFromCart: (department?: string) => Requisition | null;
   approveRequisition: (prId: string) => void;
@@ -63,7 +65,9 @@ interface ReliableStoreContextType {
   createRFQ: (rfqData: Omit<RFQ, 'id' | 'rfqNumber' | 'createdAt' | 'status' | 'quotes'>) => RFQ;
   awardRFQQuote: (rfqId: string, quoteId: string) => void;
   matches: ThreeWayMatch[];
+  clearMatchSettlement: (poNumber: string) => void;
   companies: Company[];
+  addCompany: (company: Omit<Company, 'id'>) => void;
   toggleCompanyStatus: (companyId: string) => void;
   resetDemoData: () => void;
   isAuthenticated: boolean;
@@ -486,6 +490,46 @@ export function ReliableProvider({ children }: { children: React.ReactNode }) {
     saveStored(STORAGE_KEYS.PRODUCTS, updated);
   };
 
+  // Bulk add products (e.g. from CSV uploader)
+  const bulkAddProducts = (newProducts: Omit<Product, 'id'>[]) => {
+    const created: Product[] = newProducts.map((p, idx) => ({
+      ...p,
+      id: `prod-${Date.now()}-${idx}`
+    }));
+    const updated = [...created, ...products];
+    setProducts(updated);
+    saveStored(STORAGE_KEYS.PRODUCTS, updated);
+  };
+
+  // Adjust Stock for warehouse / inventory
+  const adjustProductStock = (productId: string, newStock: number) => {
+    const updated = products.map(p => 
+      p.id === productId ? { ...p, stock: Math.max(0, newStock) } : p
+    );
+    setProducts(updated);
+    saveStored(STORAGE_KEYS.PRODUCTS, updated);
+  };
+
+  // Clear 3-Way Match payment settlement
+  const clearMatchSettlement = (poNumber: string) => {
+    const updated = matches.map(m => 
+      m.poNumber === poNumber ? { ...m, paymentSettlementStatus: 'CLEARED' as const } : m
+    );
+    setMatches(updated);
+    saveStored(STORAGE_KEYS.MATCHES, updated);
+  };
+
+  // Add Company (Vendor or Enterprise)
+  const addCompany = (company: Omit<Company, 'id'>) => {
+    const newCompany: Company = {
+      ...company,
+      id: `comp-${company.type === 'VENDOR' ? 'ven' : 'ent'}-${Date.now()}`
+    };
+    const updated = [newCompany, ...companies];
+    setCompanies(updated);
+    saveStored(STORAGE_KEYS.COMPANIES, updated);
+  };
+
   // Toggle company KYC status (Super Admin control)
   const toggleCompanyStatus = (companyId: string) => {
     const updated = companies.map(c => {
@@ -526,6 +570,8 @@ export function ReliableProvider({ children }: { children: React.ReactNode }) {
         clearCart,
         products,
         addProduct,
+        bulkAddProducts,
+        adjustProductStock,
         requisitions,
         createRequisitionFromCart,
         approveRequisition,
@@ -536,7 +582,9 @@ export function ReliableProvider({ children }: { children: React.ReactNode }) {
         createRFQ,
         awardRFQQuote,
         matches,
+        clearMatchSettlement,
         companies,
+        addCompany,
         toggleCompanyStatus,
         resetDemoData,
         isAuthenticated,

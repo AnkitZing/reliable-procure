@@ -8,15 +8,10 @@ import {
 } from 'lucide-react';
 
 export default function ThreeWayMatchingPage() {
-  const { matches } = useReliableStore();
-  const [localMatches, setLocalMatches] = useState(matches);
+  const { matches, clearMatchSettlement } = useReliableStore();
 
   const handleClearPayment = (poNumber: string) => {
-    setLocalMatches(prev => prev.map(m => 
-      m.poNumber === poNumber 
-        ? { ...m, paymentSettlementStatus: 'CLEARED' as const } 
-        : m
-    ));
+    clearMatchSettlement(poNumber);
   };
 
   return (
@@ -78,7 +73,7 @@ export default function ThreeWayMatchingPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {localMatches.map((m) => {
+                {matches.map((m) => {
                   const isMatched = m.matchStatus === 'MATCHED';
 
                   return (

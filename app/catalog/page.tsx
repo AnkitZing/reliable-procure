@@ -23,7 +23,7 @@ function CatalogContent() {
   const initialBrand = searchParams.get('brand') || '';
   const activeView = searchParams.get('view') || 'products';
 
-  const { products, addToCart, currentRole, addProduct } = useReliableStore();
+  const { products, addToCart, currentRole, addProduct, bulkAddProducts } = useReliableStore();
 
   const [searchQuery, setSearchQuery] = useState(initialQ);
   const [selectedCategory, setSelectedCategory] = useState<string>(initialCat);
@@ -326,19 +326,63 @@ function CatalogContent() {
                   </div>
                   <button
                     onClick={() => {
+                      bulkAddProducts([
+                        {
+                          name: 'Fluke 101 Pocket Digital Multimeter 600V CAT III',
+                          sku: 'FLK-101',
+                          category: 'Test & Measuring Instruments',
+                          description: 'Factory calibrated CAT III 600V safety rated compact digital multimeter.',
+                          brand: 'Fluke',
+                          basePrice: 3450,
+                          contractPrice: 3105,
+                          hsnCode: '903031',
+                          gstRate: 18,
+                          unit: 'Pieces',
+                          moq: 2,
+                          stock: 120,
+                          image: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80',
+                          tiers: [
+                            { minQty: 2, price: 3105 },
+                            { minQty: 10, price: 2890 }
+                          ],
+                          vendorId: 'comp-ven-01',
+                          vendorName: 'Industrial Supply Hub LLP'
+                        },
+                        {
+                          name: '3M SecureFit 400 Protective Eyewear Anti-Fog Clear',
+                          sku: '3M-SEC-92',
+                          category: 'Safety Equipment & Gear',
+                          description: 'Pressure diffusion temple technology for self-adjusting comfort.',
+                          brand: '3M Industrial',
+                          basePrice: 380,
+                          contractPrice: 342,
+                          hsnCode: '900490',
+                          gstRate: 18,
+                          unit: 'Pieces',
+                          moq: 20,
+                          stock: 800,
+                          image: 'https://images.unsplash.com/photo-1578873375972-00b86a87747e?auto=format&fit=crop&w=600&q=80',
+                          tiers: [
+                            { minQty: 20, price: 342 },
+                            { minQty: 100, price: 299 }
+                          ],
+                          vendorId: 'comp-ven-01',
+                          vendorName: 'Industrial Supply Hub LLP'
+                        }
+                      ]);
                       setCsvUploaded(true);
-                      setTimeout(() => setCsvUploaded(false), 4000);
+                      setTimeout(() => setCsvUploaded(false), 5000);
                     }}
                     className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-xs transition cursor-pointer"
                   >
-                    Simulate Upload File
+                    Simulate Upload & Ingest Batch
                   </button>
                 </div>
 
                 {csvUploaded && (
                   <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                    <span>Success! 1,280 SKUs & Volume discount pricing rules ingested into catalog master.</span>
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span>Success! Verified SKUs and pre-negotiated volume discount pricing rules ingested into catalog master.</span>
                   </div>
                 )}
               </div>
