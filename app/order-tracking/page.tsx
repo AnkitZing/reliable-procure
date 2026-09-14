@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { Navbar } from '@/components/Navbar';
 import { EnterpriseSidebar } from '@/components/EnterpriseSidebar';
 import { useReliableStore } from '@/lib/store';
@@ -11,14 +12,28 @@ import {
   Building2, Calendar, FileText, AlertCircle
 } from 'lucide-react';
 
-export default function OrderTrackingPage() {
+function OrderTrackingContent() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const searchParams = useSearchParams();
   const { purchaseOrders } = useReliableStore();
 
-  const [searchQuery, setSearchQuery] = useState('PO-2026-0941');
+  const initialQuery = searchParams.get('q') || 'PO-2026-0941';
+  const [searchQuery, setSearchQuery] = useState(initialQuery);
   const [searchedPO, setSearchedPO] = useState(
-    purchaseOrders.find(po => po.poNumber === 'PO-2026-0941') || purchaseOrders[0]
+    purchaseOrders.find(po => po.poNumber.toUpperCase() === initialQuery.toUpperCase()) || purchaseOrders[0]
   );
+
+  useEffect(() => {
+    const q = searchParams.get('q');
+    if (q) {
+      setSearchQuery(q);
+      const found = purchaseOrders.find(
+        po => po.poNumber.toUpperCase() === q.toUpperCase() || 
+              (po.trackingNumber && po.trackingNumber.toUpperCase().includes(q.toUpperCase()))
+      );
+      if (found) setSearchedPO(found);
+    }
+  }, [searchParams, purchaseOrders]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -274,7 +289,9 @@ export default function OrderTrackingPage() {
                       {searchedPO.items.map((item, idx) => (
                         <tr key={idx} className="hover:bg-slate-50/80 transition">
                           <td className="p-3.5">
-                            <div className="font-bold text-slate-900">{item.productName}</div>
+                            <Link href={`/product/${item.productId}`} className="font-bold text-slate-900 hover:text-blue-600 transition block">
+                              {item.productName}
+                            </Link>
                             <div className="text-[10px] font-mono text-slate-400">{item.sku}</div>
                           </td>
                           <td className="p-3.5 text-center font-mono">{item.hsnCode}</td>
@@ -301,3 +318,12 @@ export default function OrderTrackingPage() {
     </div>
   );
 }
+
+export default function OrderTrackingPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-slate-50 flex items-center justify-center text-xs text-slate-500">Loading Consignment Tracker...</div>}>
+      <OrderTrackingContent />
+    </Suspense>
+  );
+}
+

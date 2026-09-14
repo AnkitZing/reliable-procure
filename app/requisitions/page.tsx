@@ -6,12 +6,13 @@ import { useReliableStore } from '@/lib/store';
 import { Requisition } from '@/lib/types';
 import { 
   FileText, CheckCircle2, XCircle, 
-  Clock, Eye, Building2, UserCheck, ArrowRight 
+  Clock, Eye, Building2, UserCheck, ArrowRight,
+  ShoppingCart
 } from 'lucide-react';
 import Link from 'next/link';
 
 export default function RequisitionsPage() {
-  const { requisitions, currentRole, approveRequisition, rejectRequisition } = useReliableStore();
+  const { requisitions, currentRole, approveRequisition, rejectRequisition, cart, createRequisitionFromCart } = useReliableStore();
   const [selectedPR, setSelectedPR] = useState<Requisition | null>(null);
   const [rejectingPrId, setRejectingPrId] = useState<string | null>(null);
   const [rejectReason, setRejectReason] = useState('');
@@ -61,6 +62,46 @@ export default function RequisitionsPage() {
             <span>+ Create New Requisition</span>
           </Link>
         </div>
+
+        {/* Active Draft Cart Banner to Submit PR */}
+        {cart.length > 0 && (
+          <div className="bg-gradient-to-r from-blue-900 to-indigo-900 text-white rounded-2xl p-5 shadow-md flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="space-y-1">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-500/30 text-blue-200 text-[11px] font-bold">
+                <ShoppingCart className="w-3.5 h-3.5" />
+                <span>{cart.length} Product(s) in Requisition Draft Cart</span>
+              </div>
+              <h3 className="text-sm sm:text-base font-bold text-white">
+                Draft Requisition Items Ready for Submission
+              </h3>
+              <p className="text-xs text-blue-200">
+                {cart.map(c => `${c.quantity}x ${c.product.name}`).join(' • ')}
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3 shrink-0">
+              <div className="text-right">
+                <div className="text-[10px] text-blue-300 uppercase">Estimated Total:</div>
+                <div className="text-base font-black font-mono">
+                  ₹{cart.reduce((acc, c) => acc + (c.effectiveUnitPrice * c.quantity * (1 + (c.product.gstRate / 100))), 0).toLocaleString('en-IN')}
+                </div>
+              </div>
+
+              <button
+                onClick={() => {
+                  const created = createRequisitionFromCart();
+                  if (created) {
+                    setSelectedPR(created);
+                  }
+                }}
+                className="px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold rounded-xl shadow-xs transition flex items-center gap-1.5 cursor-pointer"
+              >
+                <span>Submit Official PR</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* PR List Table */}
         <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">

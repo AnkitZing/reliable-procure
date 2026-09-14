@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { Navbar } from '@/components/Navbar';
 import { useReliableStore } from '@/lib/store';
 import { PurchaseOrder } from '@/lib/types';
@@ -102,10 +103,17 @@ export default function PurchaseOrdersPage() {
 
                     <td className="p-4 text-slate-500">
                       {po.trackingNumber ? (
-                        <div className="text-xs">
-                          <span className="font-mono text-slate-900 font-bold block">{po.trackingNumber}</span>
-                          <span className="text-[10px] text-slate-500">{po.carrierName}</span>
-                        </div>
+                        <Link 
+                          href={`/order-tracking?q=${encodeURIComponent(po.poNumber)}`}
+                          className="text-xs group hover:text-blue-600 block transition"
+                          title="Click to track live consignment"
+                        >
+                          <span className="font-mono text-blue-700 font-bold block group-hover:underline">{po.trackingNumber}</span>
+                          <span className="text-[10px] text-slate-500 flex items-center gap-1">
+                            <span>{po.carrierName}</span>
+                            <span className="text-blue-600">&rarr;</span>
+                          </span>
+                        </Link>
                       ) : (
                         <span className="text-slate-400 text-[11px]">Awaiting Dispatch</span>
                       )}
